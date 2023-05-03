@@ -2,7 +2,7 @@
 
 자판기의 웹페이지 버전 React로 리펙토링
 <br/>
-<a href="https://leeleeleeleejun.github.io/React_Vending-machine/">📄완성된 페이지 확📄</a>
+<a href="https://leeleeleeleejun.github.io/React_Vending-machine/">📄완성된 페이지 확인📄</a>
 
 
 
