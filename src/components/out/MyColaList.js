@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import ListFrame from '../common/ListFrame';
-import ItemInBasket from '../in/ItemInBasket';
+import ListFrame from 'components/common/ListFrame';
+import ItemInBasket from 'components/in/ItemInBasket';
 const MyColaList = styled(ListFrame)`
   border-radius: 5px;
   height: 356px;

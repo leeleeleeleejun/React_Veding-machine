@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import React from 'react';
 
-const Unorderedlist = styled.ul`
+const UnOrderedList = styled.ul`
   position: relative;
   height: 272px;
   display: flex;
@@ -58,7 +58,7 @@ function MenuList({ item, addBasketHandle }) {
 
   return (
     <>
-      <Unorderedlist>
+      <UnOrderedList>
         {itemAry.map((item) => (
           <ItemWrap key={item.id}>
             <ItemButton
@@ -68,11 +68,11 @@ function MenuList({ item, addBasketHandle }) {
             >
               <Img src={item.img}></Img>
               <ItemName>{item.name}</ItemName>
-              <Price>{item.price}원</Price>
+              <Price>{Number(item.price).toLocaleString()}원</Price>
             </ItemButton>
           </ItemWrap>
         ))}
-      </Unorderedlist>
+      </UnOrderedList>
     </>
   );
 }

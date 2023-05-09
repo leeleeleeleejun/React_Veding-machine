@@ -1,30 +1,30 @@
 import styled from 'styled-components';
 import { Reset } from 'styled-reset';
-import logoImg from './img/logo.png';
-import Original_Cola_Img from './img/Original_Cola.png';
-import Violet_Cola_Img from './img/Violet_Cola.png';
-import Yellow_Cola_Img from './img/Yellow_Cola.png';
-import Cool_Cola_Img from './img/Cool_Cola.png';
-import Green_Cola_Img from './img/Green_Cola.png';
-import Orange_Cola_Img from './img/Orange_Cola.png';
-import Chinken_Img from './img/Chinken.png';
-import Pizza_Img from './img/Pizza.png';
-import Hamberger_Img from './img/Hamberger.png';
-import Article from './components/Article';
-import MenuList from './components/in/menuList';
-import VendingMachineEffect from './components/common/VendingMachineEffect';
-import VendingMachineBalance from './components/in/VendingMachineBalance';
-import EffectButton from './components/common/EffectButton';
-import GlobalStyle from './components/GlobalStyle';
-import Input from './components/common/Input';
-import DepositButtonWrap from './components/in/DepositButtonWrap';
-import BasketList from './components/in/BasketList';
-import Amount from './components/common/Amount';
-import MyMoney from './components/out/MyMoney,Coin';
-import SortButton from './components/out/SortButton';
-import MyColaList from './components/out/MyColaList';
-import MyColaTitle from './components/out/MyColaTitle';
-import Guide from './components/common/Guide';
+import logoImg from 'img/logo.png';
+import Original_Cola_Img from 'img/Original_Cola.png';
+import Violet_Cola_Img from 'img/Violet_Cola.png';
+import Yellow_Cola_Img from 'img/Yellow_Cola.png';
+import Cool_Cola_Img from 'img/Cool_Cola.png';
+import Green_Cola_Img from 'img/Green_Cola.png';
+import Orange_Cola_Img from 'img/Orange_Cola.png';
+import Chicken_Img from 'img/Chicken.png';
+import Pizza_Img from 'img/Pizza.png';
+import Hamburger_Img from 'img/Hamburger.png';
+import Article from 'components/Article';
+import MenuList from 'components/in/menuList';
+import VendingMachineEffect from 'components/common/VendingMachineEffect';
+import VendingMachineBalance from 'components/in/VendingMachineBalance';
+import EffectButton from 'components/common/EffectButton';
+import GlobalStyle from 'components/GlobalStyle';
+import Input from 'components/common/Input';
+import DepositButtonWrap from 'components/in/DepositButtonWrap';
+import BasketList from 'components/in/BasketList';
+import Amount from 'components/common/Amount';
+import MyMoney from 'components/out/MyMoney,Coin';
+import SortButton from 'components/out/SortButton';
+import MyColaList from 'components/out/MyColaList';
+import MyColaTitle from 'components/out/MyColaTitle';
+import Guide from 'components/common/Guide';
 import { useState, useReducer, useEffect, useRef } from 'react';
 
 const Wrap = styled.div`
@@ -68,9 +68,9 @@ const item = [
   { name: 'Cool_Cola', price: 1000, id: 4, img: Cool_Cola_Img },
   { name: 'Green_Cola', price: 1000, id: 5, img: Green_Cola_Img },
   { name: 'Orange_Cola', price: 1000, id: 6, img: Orange_Cola_Img },
-  { name: 'Chinken', price: 4000, id: 7, img: Chinken_Img },
+  { name: 'Chicken', price: 4000, id: 7, img: Chicken_Img },
   { name: 'Pizza', price: 5000, id: 8, img: Pizza_Img },
-  { name: 'Hamberger', price: 6000, id: 9, img: Hamberger_Img },
+  { name: 'Hamburger', price: 6000, id: 9, img: Hamburger_Img },
 ];
 
 function App() {
@@ -141,14 +141,14 @@ function App() {
           ...state,
           inCoin: Number(state.inCoin) - Number(action.price / 1000),
         };
-      case 'ADD_ITEM_IN_BASKET_SPLIT_COIN_MONEY':
+      case 'ADD_ITEM_IN_BASKET_BOTH_COIN_MONEY':
         return {
           inMoney:
             Number(state.inMoney) -
             (Number(action.price) - Number(state.inCoin) * 1000),
           inCoin: 0,
         };
-      case 'CANCLE_ITEM_IN_BASKET':
+      case 'CANCEL_ITEM_IN_BASKET':
         if (action.useCoinCount >= action.price / 1000) {
           return {
             ...state,
@@ -292,15 +292,15 @@ function App() {
           addOrPlus(inCash.inCoin);
           // 사용한 코인 갯수 파악을 위한 카운트 (아이템 취소 시 사용한 만큼의 코인 반환 필요)
           setInCashState({
-            type: 'ADD_ITEM_IN_BASKET_SPLIT_COIN_MONEY',
+            type: 'ADD_ITEM_IN_BASKET_BOTH_COIN_MONEY',
             price: action.item.price,
           });
         }
         return { ...state };
 
-      case 'CANCLE_ITEM':
+      case 'CANCEL_ITEM':
         setInCashState({
-          type: 'CANCLE_ITEM_IN_BASKET',
+          type: 'CANCEL_ITEM_IN_BASKET',
           price: action.item.price,
           useCoinCount: state.useCoinCount[action.item.name],
         });
@@ -360,7 +360,7 @@ function App() {
   }
 
   function cancelButtonHandle(item) {
-    setBasketList({ type: 'CANCLE_ITEM', item: item });
+    setBasketList({ type: 'CANCEL_ITEM', item: item });
   }
 
   const [dragAndDropToggle, setDragAndDropToggle] = useState(false);
@@ -439,7 +439,7 @@ function App() {
               <BasketList
                 basketListItem={basketList.itemInList}
                 basketListCount={basketList.count}
-                isBsket
+                isBasket
                 cancelButtonHandle={cancelButtonHandle}
               />
               <EffectButton
@@ -491,16 +491,18 @@ function App() {
             <>
               <Amount
                 text1="총금액: "
-                number={
-                  basketTotal >= 10000
-                    ? basketTotal - basketTotal * 0.15
-                    : basketTotal
-                }
+                number={(basketTotal >= 10000
+                  ? basketTotal - basketTotal * 0.15
+                  : basketTotal
+                ).toLocaleString()}
                 text2="원"
               />
               <Amount
                 text1="할인된 금액: "
-                number={basketTotal >= 10000 ? basketTotal * 0.15 : 0}
+                number={(basketTotal >= 10000
+                  ? basketTotal * 0.15
+                  : 0
+                ).toLocaleString()}
                 text2="원"
               />
               <Guide>* 10,000 원 이상 구매 시 15% 할인</Guide>
@@ -546,7 +548,7 @@ function App() {
               text1="총금액: "
               text2="원"
               align
-              number={inventoryTotal.current}
+              number={inventoryTotal.current.toLocaleString()}
             />
           </Article>
         </Section>

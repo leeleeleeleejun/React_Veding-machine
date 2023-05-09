@@ -26,7 +26,7 @@ const ItemName = styled.strong`
   font-size: 9px;
   font-weight: 500;
 `;
-const CancleButton = styled.button`
+const CancelButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,7 +55,7 @@ const ItemCount = styled.span`
 const ItemInBasket = ({
   img,
   name,
-  isBsket,
+  isBasket,
   cancelButtonHandle,
   count,
   setItemInInventory,
@@ -144,8 +144,8 @@ const ItemInBasket = ({
         <ItemName>{name}</ItemName>
       </Div>
       <Div>
-        {isBsket ? (
-          <CancleButton onClick={cancelButtonHandle}>취소</CancleButton>
+        {isBasket ? (
+          <CancelButton onClick={cancelButtonHandle}>취소</CancelButton>
         ) : (
           <></>
         )}

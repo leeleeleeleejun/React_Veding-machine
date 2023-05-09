@@ -19,7 +19,7 @@ const VendingMachineBalance = ({ text1, text2, number }) => {
     <VendingMachineBalanceTag>
       {text1}
       <span>
-        <span>{number}</span>
+        <span>{Number(number).toLocaleString()}</span>
         {text2}
       </span>
     </VendingMachineBalanceTag>

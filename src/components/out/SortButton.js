@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components';
 import React, { useState } from 'react';
-import EffectButton from '../common/EffectButton';
+import EffectButton from 'components/common/EffectButton';
 
 const DropdownTag = styled.span`
   display: inline-block;
@@ -18,8 +18,8 @@ const DropdownContentWrapTag = styled.ul`
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
   z-index: 99999999999;
   transition: all 0.3s;
-  ${({ Dropdowntoggle }) =>
-    Dropdowntoggle &&
+  ${({ DropdownToggle }) =>
+    DropdownToggle &&
     css`
       display: flex;
       flex-direction: column;
@@ -46,7 +46,7 @@ const SortButton = ({
   setDragAndDropToggle,
   dragAndDropToggle,
 }) => {
-  const [Dropdowntoggle, setDropdown] = useState(false);
+  const [DropdownToggle, setDropdown] = useState(false);
 
   return (
     <DropdownTag
@@ -55,7 +55,7 @@ const SortButton = ({
     >
       <EffectButton plus="sortButton">정 렬</EffectButton>
 
-      <DropdownContentWrapTag Dropdowntoggle={Dropdowntoggle}>
+      <DropdownContentWrapTag DropdownToggle={DropdownToggle}>
         <li>
           <DropdownContentButtonTag
             onClick={() => {

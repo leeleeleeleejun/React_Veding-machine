@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import EffectButton from '../common/EffectButton';
+import EffectButton from 'components/common/EffectButton';
 
 const DepositButtonWrapTag = styled.div`
   display: flex;

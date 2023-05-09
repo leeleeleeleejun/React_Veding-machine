@@ -11,8 +11,8 @@ const EffectButtonTag = styled.button`
     background-color: rgba(0, 0, 0, 0.8);
   }
 
-  ${(props) => {
-    switch (props.plus) {
+  ${({ plus }) => {
+    switch (plus) {
       case 'deposit':
         return css`
           width: 45%;

@@ -19,7 +19,7 @@ const MyMoney = ({ coin, text1, text2, number }) => {
     <MyMoneyTag coin={coin}>
       {text1}
       <span>
-        <span>{number}</span>
+        <span>{Number(number).toLocaleString()}</span>
         {text2}
       </span>
     </MyMoneyTag>
