@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.js": "/React_Vending-machine/static/js/main.e29238cb.js",
+    "main.js": "/React_Vending-machine/static/js/main.db12476e.js",
     "static/js/787.a1e09414.chunk.js": "/React_Vending-machine/static/js/787.a1e09414.chunk.js",
     "static/media/Pizza.png": "/React_Vending-machine/static/media/Pizza.8d48ab5cb9035eba9ce9.png",
-    "static/media/Hamberger.png": "/React_Vending-machine/static/media/Hamberger.2479426002af7577057e.png",
+    "static/media/Hamburger.png": "/React_Vending-machine/static/media/Hamburger.2479426002af7577057e.png",
     "static/media/logo.png": "/React_Vending-machine/static/media/logo.c556d9cc72692fb56b7c.png",
-    "static/media/Chinken.png": "/React_Vending-machine/static/media/Chinken.e69997cfaebd496c312d.png",
+    "static/media/Chicken.png": "/React_Vending-machine/static/media/Chicken.e69997cfaebd496c312d.png",
     "static/media/Violet_Cola.png": "/React_Vending-machine/static/media/Violet_Cola.caf74642f77c6be894e8.png",
     "static/media/Green_Cola.png": "/React_Vending-machine/static/media/Green_Cola.61e3d85d55c88c7e25ea.png",
     "static/media/Yellow_Cola.png": "/React_Vending-machine/static/media/Yellow_Cola.506fa67b1206d5ad37ff.png",
@@ -13,10 +13,10 @@
     "static/media/Orange_Cola.png": "/React_Vending-machine/static/media/Orange_Cola.c88c46c940e675538b2a.png",
     "static/media/Original_Cola.png": "/React_Vending-machine/static/media/Original_Cola.3c967bc76f55ec641756.png",
     "index.html": "/React_Vending-machine/index.html",
-    "main.e29238cb.js.map": "/React_Vending-machine/static/js/main.e29238cb.js.map",
+    "main.db12476e.js.map": "/React_Vending-machine/static/js/main.db12476e.js.map",
     "787.a1e09414.chunk.js.map": "/React_Vending-machine/static/js/787.a1e09414.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.e29238cb.js"
+    "static/js/main.db12476e.js"
   ]
 }
