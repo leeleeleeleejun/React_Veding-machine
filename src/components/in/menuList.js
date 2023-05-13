@@ -53,7 +53,7 @@ const Price = styled.span`
   color: #ffffff;
 `;
 
-function MenuList({ item, addBasketHandle }) {
+const MenuList = ({ item, addBasketHandle }) => {
   const itemAry = item;
 
   return (
@@ -75,6 +75,6 @@ function MenuList({ item, addBasketHandle }) {
       </UnOrderedList>
     </>
   );
-}
+};
 
 export default MenuList;

@@ -73,34 +73,24 @@ const item = [
   { name: 'Hamburger', price: 6000, id: 9, img: Hamburger_Img },
 ];
 
-function App() {
+const App = () => {
   const [inputForm, setInputForm] = useState({
     deposit: '',
     changeCoin: '',
   });
 
-  function inputHandleChange(e) {
+  const inputHandleChange = (e) => {
     setInputForm((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
-  }
+  };
 
-  const [outCash, setOutCash] = useState({
-    outMoney: 25000,
-    outCoin: 0,
-  });
-
-  const [inCash, setInCashState] = useReducer(setInCashReducer, {
-    inMoney: 0,
-    inCoin: 0,
-  });
-
-  function setInCashReducer(state, action) {
+  const setInCashReducer = (state, action) => {
     //아래 변수 useRef 적용 가능성 확인 필요
     let depositInputValue = Number(inputForm.deposit);
 
-    function depositHandle(outCashPara, inCashPara) {
+    const depositHandle = (outCashPara, inCashPara) => {
       if (inputForm.deposit > 0 && inputForm.deposit <= outCash[outCashPara]) {
         return {
           ...state,
@@ -113,9 +103,9 @@ function App() {
         console.log(`${inputForm.deposit - outCash[outCashPara]}이 부족합니다`);
         return state;
       }
-    }
+    };
 
-    function returnCash(outCashPara, inCashPara) {
+    const returnCash = (outCashPara, inCashPara) => {
       setOutCash((prev) => ({
         ...prev,
         [outCashPara]: prev[outCashPara] + state[inCashPara],
@@ -124,7 +114,7 @@ function App() {
         ...state,
         [inCashPara]: 0,
       };
-    }
+    };
 
     switch (action.type) {
       case 'COIN':
@@ -169,7 +159,17 @@ function App() {
       default:
         return state;
     }
-  }
+  };
+
+  const [outCash, setOutCash] = useState({
+    outMoney: 25000,
+    outCoin: 0,
+  });
+
+  const [inCash, setInCashState] = useReducer(setInCashReducer, {
+    inMoney: 0,
+    inCoin: 0,
+  });
 
   useEffect(() => {
     setInputForm((prev) => ({
@@ -209,7 +209,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inCash.inMoney]);
 
-  function CoinChangeHandle(e) {
+  const CoinChangeHandle = (e) => {
     e.preventDefault();
     if (
       outCash.outMoney > inputForm.changeCoin * 900 &&
@@ -232,7 +232,7 @@ function App() {
         changeCoin: '',
       }));
     }
-  }
+  };
 
   const basketListItemCount = {};
   item.forEach((item) => (basketListItemCount[item.name] = 0));
@@ -240,27 +240,8 @@ function App() {
   const basketListUseCoinCount = {};
   item.forEach((item) => (basketListUseCoinCount[item.name] = 0));
 
-  const [basketList, setBasketList] = useReducer(setItemInBasket, {
-    itemInList: [],
-    count: basketListItemCount,
-    useCoinCount: basketListUseCoinCount,
-  });
-
-  const [basketTotal, setBasketTotal] = useState(0);
-  const inventoryTotal = useRef(0);
-  useEffect(() => {
-    setBasketTotal(() => {
-      if (basketList.itemInList.length > 0) {
-        return basketList.itemInList.reduce(
-          (a, b) => a + b.price * basketList.count[b.name],
-          0
-        );
-      } else return 0;
-    });
-  }, [basketList, basketTotal]);
-
-  function setItemInBasket(state, action) {
-    function addOrPlus(useCoinCountPara) {
+  const setItemInBasket = (state, action) => {
+    const addOrPlus = (useCoinCountPara) => {
       state = {
         itemInList:
           state.count[action.item.name] === 0
@@ -277,7 +258,7 @@ function App() {
             Number(useCoinCountPara),
         },
       };
-    }
+    };
 
     switch (action.type) {
       case 'ADD_BASKET':
@@ -323,7 +304,7 @@ function App() {
           };
         else
           return {
-            itemInList: [...state.itemInList].filter(function (i) {
+            itemInList: [...state.itemInList].filter((i) => {
               return i.name !== action.item.name;
             }),
             count: {
@@ -344,7 +325,26 @@ function App() {
       default:
         return state;
     }
-  }
+  };
+
+  const [basketList, setBasketList] = useReducer(setItemInBasket, {
+    itemInList: [],
+    count: basketListItemCount,
+    useCoinCount: basketListUseCoinCount,
+  });
+
+  const [basketTotal, setBasketTotal] = useState(0);
+  const inventoryTotal = useRef(0);
+  useEffect(() => {
+    setBasketTotal(() => {
+      if (basketList.itemInList.length > 0) {
+        return basketList.itemInList.reduce(
+          (a, b) => a + b.price * basketList.count[b.name],
+          0
+        );
+      } else return 0;
+    });
+  }, [basketList, basketTotal]);
 
   const itemInInventoryCount = {};
   item.forEach((item) => (itemInInventoryCount[item.name] = 0));
@@ -355,13 +355,13 @@ function App() {
   });
 
   // 위 setItemInBasketCountReducer의 리듀서함수
-  function addBasketHandle(item) {
+  const addBasketHandle = (item) => {
     setBasketList({ type: 'ADD_BASKET', item: item });
-  }
+  };
 
-  function cancelButtonHandle(item) {
+  const cancelButtonHandle = (item) => {
     setBasketList({ type: 'CANCEL_ITEM', item: item });
-  }
+  };
 
   const [dragAndDropToggle, setDragAndDropToggle] = useState(false);
 
@@ -555,6 +555,6 @@ function App() {
       </Wrap>
     </>
   );
-}
+};
 
 export default App;

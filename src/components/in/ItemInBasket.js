@@ -63,7 +63,7 @@ const ItemInBasket = ({
   dragAndDropToggle,
 }) => {
   //  커스텀정렬에 사용된 함수 (들어갈 자리 찾기)
-  function getDragAfterElement(container, y) {
+  const getDragAfterElement = (container, y) => {
     const draggableElements = [...container].filter(
       (item) => item.draggable === false
     );
@@ -79,7 +79,7 @@ const ItemInBasket = ({
       },
       { offset: Number.NEGATIVE_INFINITY }
     ).element;
-  }
+  };
 
   return (
     <Li
