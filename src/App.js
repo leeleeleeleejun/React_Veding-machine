@@ -120,7 +120,7 @@ const App = () => {
         }
       };
 
-      const returnCash = (outCashPara, inCashPara) => {
+      const returnCashHandle = (outCashPara, inCashPara) => {
         setOutCash((prev) => ({
           ...prev,
           [outCashPara]: prev[outCashPara] + state[inCashPara],
@@ -137,9 +137,9 @@ const App = () => {
         case 'MONEY':
           return depositHandle('outMoney', 'inMoney');
         case 'RETURN_DEPOSIT_COIN':
-          return returnCash('outCoin', 'inCoin');
+          return returnCashHandle('outCoin', 'inCoin');
         case 'RETURN_DEPOSIT_MONEY':
-          return returnCash('outMoney', 'inMoney');
+          return returnCashHandle('outMoney', 'inMoney');
 
         case 'ADD_ITEM_IN_BASKET_ALL_COIN':
           return {
@@ -382,13 +382,13 @@ const App = () => {
   });
 
   // 위 setItemInBasketCountReducer의 리듀서함수
-  const addBasketHandle = (item) => {
+  const addBasketHandle = useCallback((item) => {
     setBasketList({ type: 'ADD_BASKET', item: item });
-  };
+  }, []);
 
-  const cancelButtonHandle = (item) => {
+  const cancelButtonHandle = useCallback((item) => {
     setBasketList({ type: 'CANCEL_ITEM', item: item });
-  };
+  }, []);
 
   const [dragAndDropToggle, setDragAndDropToggle] = useState(false);
 
