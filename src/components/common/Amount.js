@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 
 const Strong = styled.strong`
@@ -17,4 +18,4 @@ const Amount = ({ align, text1, number, text2 }) => {
   );
 };
 
-export default Amount;
+export default React.memo(Amount);

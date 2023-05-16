@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 import ListFrame from 'components/common/ListFrame';
 import ItemInBasket from 'components/in/ItemInBasket';
@@ -29,4 +30,4 @@ const MyColaListWrap = ({
   );
 };
 
-export default MyColaListWrap;
+export default React.memo(MyColaListWrap);

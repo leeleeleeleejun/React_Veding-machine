@@ -77,4 +77,4 @@ const MenuList = ({ item, addBasketHandle }) => {
   );
 };
 
-export default MenuList;
+export default React.memo(MenuList);

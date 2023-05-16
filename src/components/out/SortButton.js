@@ -101,4 +101,4 @@ const SortButton = ({
   );
 };
 
-export default SortButton;
+export default React.memo(SortButton);

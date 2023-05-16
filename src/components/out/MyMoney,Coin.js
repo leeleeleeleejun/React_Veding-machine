@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 
 const MyMoneyTag = styled.div`
@@ -26,4 +27,4 @@ const MyMoney = ({ coin, text1, text2, number }) => {
   );
 };
 
-export default MyMoney;
+export default React.memo(MyMoney);

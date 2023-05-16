@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 //import EffectMenuFrame from '../common/EffectMenuFrame';
 
@@ -26,4 +27,4 @@ const VendingMachineBalance = ({ text1, text2, number }) => {
   );
 };
 
-export default VendingMachineBalance;
+export default React.memo(VendingMachineBalance);

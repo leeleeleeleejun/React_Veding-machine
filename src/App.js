@@ -25,9 +25,7 @@ import SortButton from 'components/out/SortButton';
 import MyColaList from 'components/out/MyColaList';
 import MyColaTitle from 'components/out/MyColaTitle';
 import Guide from 'components/common/Guide';
-import { useState, useReducer, useEffect, useRef } from 'react';
-import { useCallback } from 'react';
-import { useMemo } from 'react';
+import { useState, useReducer, useEffect, useRef, useCallback } from 'react';
 
 const Wrap = styled.div`
   background-color: #eae8fe;
@@ -74,6 +72,196 @@ const productList = [
   { name: 'Pizza', price: 5000, id: 8, img: Pizza_Img },
   { name: 'Hamburger', price: 6000, id: 9, img: Hamburger_Img },
 ];
+//잔액, 잔여코인 관련 리듀서
+const setInCashReducer = (state, action) => {
+  //아래 변수 useRef 적용 가능성 확인 필요
+  const {
+    type,
+    price,
+    useCoinCount,
+    basketTotal,
+    inputForm,
+    outCash,
+    setOutCash,
+  } = action;
+  let depositInputValue = Number(inputForm.deposit);
+
+  const depositHandle = (outCashPara, inCashPara) => {
+    if (inputForm.deposit > 0 && inputForm.deposit <= outCash[outCashPara]) {
+      return {
+        ...state,
+        [inCashPara]: Number(state[inCashPara]) + Number(depositInputValue),
+      };
+    } else if (inputForm.deposit <= 0) {
+      alert('다시입력해주세요');
+      return state;
+    } else {
+      alert(
+        `${(
+          inputForm.deposit - outCash[outCashPara]
+        ).toLocaleString()}원이 부족합니다`
+      );
+      return state;
+    }
+  };
+
+  const returnCashHandle = (outCashPara, inCashPara) => {
+    setOutCash((prev) => ({
+      ...prev,
+      [outCashPara]: prev[outCashPara] + state[inCashPara],
+    }));
+    return {
+      ...state,
+      [inCashPara]: 0,
+    };
+  };
+
+  switch (type) {
+    case 'DEPOSIT_COIN':
+      return depositHandle('outCoin', 'inCoin');
+    case 'DEPOSIT_MONEY':
+      return depositHandle('outMoney', 'inMoney');
+    case 'RETURN_COIN':
+      return returnCashHandle('outCoin', 'inCoin');
+    case 'RETURN_MONEY':
+      return returnCashHandle('outMoney', 'inMoney');
+
+    case 'GET_ITEM_IN_BASKET_ALL_COIN':
+      return {
+        ...state,
+        inCoin: Number(state.inCoin) - Number(price / 1000),
+      };
+    case 'GET_ITEM_IN_BASKET_BOTH_COIN_MONEY':
+      return {
+        inMoney:
+          Number(state.inMoney) - (Number(price) - Number(state.inCoin) * 1000),
+        inCoin: 0,
+      };
+    case 'DELETE_ITEM_IN_BASKET':
+      if (useCoinCount >= price / 1000) {
+        return {
+          ...state,
+          inCoin: Number(state.inCoin) + Number(price / 1000),
+        };
+      } else
+        return {
+          inMoney:
+            Number(state.inMoney) +
+            (Number(price) - Number(useCoinCount) * 1000),
+          inCoin: Number(state.inCoin) + Number(useCoinCount),
+        };
+    case 'SALE_RETURN':
+      return {
+        ...state,
+        inMoney: Number(state.inMoney) + Number(basketTotal * 0.15),
+      };
+    default:
+      return state;
+  }
+};
+
+//바스켓에 담긴 아이템들의 수량 초기화
+const basketListItemCount = (() => {
+  const initialValue = {};
+  productList.forEach((item) => (initialValue[item.name] = 0));
+  return initialValue;
+})();
+
+//바스켓에 담긴 아이템들 중 어떤 아이템이 얼마나 코인을 썻는지 파악 초기화
+const basketListUseCoinCount = (() => {
+  const initialValue = {};
+  productList.forEach((item) => (initialValue[item.name] = 0));
+  return initialValue;
+})();
+//장바구니 관련 리듀서
+const setItemInBasket = (state, action) => {
+  const { item, type, inCash, inputForm, setInCashState } = action;
+  const addOrIncrease = (useCoinCountPara) => {
+    state = {
+      itemInList:
+        state.count[item.name] === 0
+          ? [...state.itemInList, item]
+          : state.itemInList,
+      count: {
+        ...state.count,
+        [item.name]: ++state.count[item.name],
+      },
+      useCoinCount: {
+        ...state.useCoinCount,
+        [item.name]:
+          Number(state.useCoinCount[item.name]) + Number(useCoinCountPara),
+      },
+    };
+  };
+
+  switch (type) {
+    case 'GET_BASKET':
+      if (inCash.inCoin >= item.price / 1000) {
+        addOrIncrease(item.price / 1000);
+        // 사용한 코인 갯수 파악을 위한 카운트 (아이템 취소 시 사용한 만큼의 코인 반환 필요)
+        setInCashState({
+          type: 'GET_ITEM_IN_BASKET_ALL_COIN',
+          price: item.price,
+          inputForm: inputForm,
+        });
+      } else if (inCash.inCoin * 1000 + inCash.inMoney >= item.price) {
+        addOrIncrease(inCash.inCoin);
+        // 사용한 코인 갯수 파악을 위한 카운트 (아이템 취소 시 사용한 만큼의 코인 반환 필요)
+        setInCashState({
+          type: 'GET_ITEM_IN_BASKET_BOTH_COIN_MONEY',
+          price: item.price,
+          inputForm: inputForm,
+        });
+      }
+      return { ...state };
+
+    case 'DELETE_ITEM':
+      setInCashState({
+        type: 'DELETE_ITEM_IN_BASKET',
+        price: item.price,
+        useCoinCount: state.useCoinCount[item.name],
+        inputForm: inputForm,
+      });
+      if (state.count[item.name] > 1)
+        return {
+          ...state,
+          count: {
+            ...state.count,
+            [item.name]: --state.count[item.name],
+          },
+          useCoinCount: {
+            ...state.useCoinCount,
+            [item.name]:
+              // 코인으로 모두 결제 또는 부분결제(현금+코인) 인지 구분 필요
+              state.useCoinCount[action.item.name] > item.price / 1000
+                ? state.useCoinCount[action.item.name] - item.price / 1000
+                : 0,
+          },
+        };
+      else
+        return {
+          itemInList: [...state.itemInList].filter((i) => {
+            return i.name !== action.item.name;
+          }),
+          count: {
+            ...state.count,
+            [action.item.name]: --state.count[action.item.name],
+          },
+          useCoinCount: {
+            ...state.useCoinCount,
+            [action.item.name]: 0,
+          },
+        };
+    case 'GET_INVENTORY':
+      return {
+        itemInList: [],
+        count: basketListItemCount,
+        useCoinCount: basketListUseCoinCount,
+      };
+    default:
+      return state;
+  }
+};
 
 const App = () => {
   const [inputForm, setInputForm] = useState({
@@ -92,91 +280,6 @@ const App = () => {
     outMoney: 25000,
     outCoin: 0,
   });
-
-  const setInCashReducer = useCallback(
-    (state, action) => {
-      //아래 변수 useRef 적용 가능성 확인 필요
-      let depositInputValue = Number(inputForm.deposit);
-      const { type, price, useCoinCount, basketTotal } = action;
-      const depositHandle = (outCashPara, inCashPara) => {
-        if (
-          inputForm.deposit > 0 &&
-          inputForm.deposit <= outCash[outCashPara]
-        ) {
-          return {
-            ...state,
-            [inCashPara]: Number(state[inCashPara]) + Number(depositInputValue),
-          };
-        } else if (inputForm.deposit <= 0) {
-          alert('다시입력해주세요');
-          return state;
-        } else {
-          alert(
-            `${(
-              inputForm.deposit - outCash[outCashPara]
-            ).toLocaleString()}원이 부족합니다`
-          );
-          return state;
-        }
-      };
-
-      const returnCashHandle = (outCashPara, inCashPara) => {
-        setOutCash((prev) => ({
-          ...prev,
-          [outCashPara]: prev[outCashPara] + state[inCashPara],
-        }));
-        return {
-          ...state,
-          [inCashPara]: 0,
-        };
-      };
-
-      switch (type) {
-        case 'COIN':
-          return depositHandle('outCoin', 'inCoin');
-        case 'MONEY':
-          return depositHandle('outMoney', 'inMoney');
-        case 'RETURN_DEPOSIT_COIN':
-          return returnCashHandle('outCoin', 'inCoin');
-        case 'RETURN_DEPOSIT_MONEY':
-          return returnCashHandle('outMoney', 'inMoney');
-
-        case 'ADD_ITEM_IN_BASKET_ALL_COIN':
-          return {
-            ...state,
-            inCoin: Number(state.inCoin) - Number(price / 1000),
-          };
-        case 'ADD_ITEM_IN_BASKET_BOTH_COIN_MONEY':
-          return {
-            inMoney:
-              Number(state.inMoney) -
-              (Number(price) - Number(state.inCoin) * 1000),
-            inCoin: 0,
-          };
-        case 'CANCEL_ITEM_IN_BASKET':
-          if (useCoinCount >= price / 1000) {
-            return {
-              ...state,
-              inCoin: Number(state.inCoin) + Number(price / 1000),
-            };
-          } else
-            return {
-              inMoney:
-                Number(state.inMoney) +
-                (Number(price) - Number(useCoinCount) * 1000),
-              inCoin: Number(state.inCoin) + Number(useCoinCount),
-            };
-        case 'SALE_RETURN':
-          return {
-            ...state,
-            inMoney: Number(state.inMoney) + Number(basketTotal * 0.15),
-          };
-        default:
-          return state;
-      }
-    },
-    [outCash, inputForm.deposit]
-  );
 
   const [inCash, setInCashState] = useReducer(setInCashReducer, {
     inMoney: 0,
@@ -205,9 +308,7 @@ const App = () => {
         outCoin: Number(prev.outCoin) - Number(inputForm.deposit),
       }));
     }
-    // inputForm.deposit 상태가 사용되지만 inputForm.deposit업데이트 될때 이 useEffect가 사용될 필요가 없음
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inCash.inCoin]);
+  }, [inCash.inCoin, inputForm.deposit]);
 
   // 자판기에 현금을 입금 시 소지 금액을 렌더링하는 Effect
   useEffect(() => {
@@ -217,9 +318,7 @@ const App = () => {
         outMoney: Number(prev.outMoney) - Number(inputForm.deposit),
       }));
     }
-    // inputForm.deposit 상태가 사용되지만 inputForm.deposit업데이트 될때 이 useEffect가 사용될 필요가 없음
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inCash.inMoney]);
+  }, [inCash.inMoney, inputForm.deposit]);
 
   const CoinChangeHandle = (e) => {
     e.preventDefault();
@@ -251,111 +350,9 @@ const App = () => {
     }
   };
 
-  //바스켓에 담긴 아이템들의 수량 초기화
-  const basketListItemCount = useMemo(() => {
-    const initialValue = {};
-    productList.forEach((item) => (initialValue[item.name] = 0));
-    return initialValue;
-  }, []);
-
-  //바스켓에 담긴 아이템들 중 어떤 아이템이 얼마나 코인을 썻는지 파악 초기화
-  const basketListUseCoinCount = useMemo(() => {
-    const initialValue = {};
-    productList.forEach((item) => (initialValue[item.name] = 0));
-    return initialValue;
-  }, []);
-
-  const setItemInBasket = useCallback(
-    (state, action) => {
-      const { item, type } = action;
-      const addOrIncrease = (useCoinCountPara) => {
-        state = {
-          itemInList:
-            state.count[item.name] === 0
-              ? [...state.itemInList, item]
-              : state.itemInList,
-          count: {
-            ...state.count,
-            [item.name]: ++state.count[item.name],
-          },
-          useCoinCount: {
-            ...state.useCoinCount,
-            [item.name]:
-              Number(state.useCoinCount[item.name]) + Number(useCoinCountPara),
-          },
-        };
-      };
-
-      switch (type) {
-        case 'ADD_BASKET':
-          if (inCash.inCoin >= item.price / 1000) {
-            addOrIncrease(item.price / 1000);
-            // 사용한 코인 갯수 파악을 위한 카운트 (아이템 취소 시 사용한 만큼의 코인 반환 필요)
-            setInCashState({
-              type: 'ADD_ITEM_IN_BASKET_ALL_COIN',
-              price: item.price,
-            });
-          } else if (inCash.inCoin * 1000 + inCash.inMoney >= item.price) {
-            addOrIncrease(inCash.inCoin);
-            // 사용한 코인 갯수 파악을 위한 카운트 (아이템 취소 시 사용한 만큼의 코인 반환 필요)
-            setInCashState({
-              type: 'ADD_ITEM_IN_BASKET_BOTH_COIN_MONEY',
-              price: item.price,
-            });
-          }
-          return { ...state };
-
-        case 'CANCEL_ITEM':
-          setInCashState({
-            type: 'CANCEL_ITEM_IN_BASKET',
-            price: item.price,
-            useCoinCount: state.useCoinCount[item.name],
-          });
-          if (state.count[item.name] > 1)
-            return {
-              ...state,
-              count: {
-                ...state.count,
-                [item.name]: --state.count[item.name],
-              },
-              useCoinCount: {
-                ...state.useCoinCount,
-                [item.name]:
-                  // 코인으로 모두 결제 또는 부분결제(현금+코인) 인지 구분 필요
-                  state.useCoinCount[action.item.name] > item.price / 1000
-                    ? state.useCoinCount[action.item.name] - item.price / 1000
-                    : 0,
-              },
-            };
-          else
-            return {
-              itemInList: [...state.itemInList].filter((i) => {
-                return i.name !== action.item.name;
-              }),
-              count: {
-                ...state.count,
-                [action.item.name]: --state.count[action.item.name],
-              },
-              useCoinCount: {
-                ...state.useCoinCount,
-                [action.item.name]: 0,
-              },
-            };
-        case 'haveItem':
-          return {
-            itemInList: [],
-            count: basketListItemCount,
-            useCoinCount: basketListUseCoinCount,
-          };
-        default:
-          return state;
-      }
-    },
-    [inCash, basketListItemCount, basketListUseCoinCount]
-  );
-
   const [basketList, setBasketList] = useReducer(setItemInBasket, {
     itemInList: [],
+    // 컴포넌트 밖에서 실행된 함수
     count: basketListItemCount,
     useCoinCount: basketListUseCoinCount,
   });
@@ -381,14 +378,30 @@ const App = () => {
     itemInInventoryCount,
   });
 
-  // 위 setItemInBasketCountReducer의 리듀서함수
-  const addBasketHandle = useCallback((item) => {
-    setBasketList({ type: 'ADD_BASKET', item: item });
-  }, []);
+  const addBasketHandle = useCallback(
+    (item) => {
+      setBasketList({
+        type: 'GET_BASKET',
+        item: item,
+        setInCashState: setInCashState,
+        inputForm: inputForm,
+        inCash: inCash,
+      });
+    },
+    [inputForm, inCash]
+  );
 
-  const cancelButtonHandle = useCallback((item) => {
-    setBasketList({ type: 'CANCEL_ITEM', item: item });
-  }, []);
+  const cancelButtonHandle = useCallback(
+    (item) => {
+      setBasketList({
+        type: 'DELETE_ITEM',
+        item: item,
+        setInCashState: setInCashState,
+        inputForm: inputForm,
+      });
+    },
+    [inputForm]
+  );
 
   const [dragAndDropToggle, setDragAndDropToggle] = useState(false);
 
@@ -422,7 +435,10 @@ const App = () => {
               />
               <EffectButton
                 onClick={() => {
-                  setInCashState({ type: 'RETURN_DEPOSIT_MONEY' });
+                  setInCashState({
+                    type: 'RETURN_MONEY',
+                    setOutCash: setOutCash,
+                  });
                 }}
               >
                 잔액 반환
@@ -437,7 +453,10 @@ const App = () => {
               />
               <EffectButton
                 onClick={() => {
-                  setInCashState({ type: 'RETURN_DEPOSIT_COIN' });
+                  setInCashState({
+                    type: 'RETURN_COIN',
+                    setOutCash: setOutCash,
+                  });
                 }}
               >
                 코인 반환
@@ -454,10 +473,18 @@ const App = () => {
               />
               <DepositButtonWrap
                 onCoinDeposit={() => {
-                  setInCashState({ type: 'COIN' });
+                  setInCashState({
+                    type: 'DEPOSIT_COIN',
+                    inputForm: inputForm,
+                    outCash: outCash,
+                  });
                 }}
                 onMoneyDeposit={() => {
-                  setInCashState({ type: 'MONEY' });
+                  setInCashState({
+                    type: 'DEPOSIT_MONEY',
+                    inputForm: inputForm,
+                    outCash: outCash,
+                  });
                 }}
               />
             </VendingMachineEffect>
@@ -475,11 +502,12 @@ const App = () => {
                 // useEffect는 비동기로 해당 이벤트 코드가 처리되고 마지막에 처리된다.
                 // 그러므로 값이 마지막에 변경이 되었으나 useRef의 특성으로 변경이 되어도 화면이 렌더링되지 않음
                 onClick={() => {
-                  setBasketList({ type: 'haveItem' });
+                  setBasketList({ type: 'GET_INVENTORY' });
                   if (basketTotal >= 10000) {
                     setInCashState({
                       type: 'SALE_RETURN',
                       basketTotal: basketTotal,
+                      inputForm: inputForm,
                     });
                     inventoryTotal.current += basketTotal - basketTotal * 0.15;
                   } else {

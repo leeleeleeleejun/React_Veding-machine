@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 import EffectButton from 'components/common/EffectButton';
 
@@ -20,4 +21,4 @@ const DepositButtonWrap = ({ onMoneyDeposit, onCoinDeposit }) => {
   );
 };
 
-export default DepositButtonWrap;
+export default React.memo(DepositButtonWrap);
